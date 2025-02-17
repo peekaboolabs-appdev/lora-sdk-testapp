@@ -27,7 +27,7 @@ class _SdkTestPageState extends State<SdkTestPage> {
     try {
       final myLlmProvider = FllamaWrapper();
       final sdk = await LoraSdk.initialize(
-        licenseKey: '2920-JI06-HXIT-AZ1B-7BX6-QNQC',
+        licenseKey: 'your-license-key',
         llmProvider: myLlmProvider,
       );
       setState(() => _sdk = sdk);
