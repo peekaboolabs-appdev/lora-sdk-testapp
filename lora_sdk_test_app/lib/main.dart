@@ -30,6 +30,14 @@ class _SdkTestPageState extends State<SdkTestPage> {
         licenseKey: 'your-license-key',
         llmProvider: myLlmProvider,
       );
+
+      // 초기화 후 상태 확인
+      if (sdk.loraState.value.modelStatus == ModelStatus.error) {
+        _showError(
+            sdk.loraState.value.errorMessage ?? 'SDK initialization failed');
+        return;
+      }
+
       setState(() => _sdk = sdk);
     } catch (e) {
       _showError('Initialization failed: $e');
@@ -95,7 +103,12 @@ class _SdkTestPageState extends State<SdkTestPage> {
     if (_sdk == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Lora SDK Test')),
-        body: const Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Text(
+            'SDK initialization failed. Please enter a valid license key. You can get a license key from our website. Please refer to the README for more details.',
+            style: TextStyle(color: Colors.black),
+          ),
+        ),
       );
     }
 
@@ -218,18 +231,16 @@ class _SdkTestPageState extends State<SdkTestPage> {
         return 'SDK initialization required';
       case ModelStatus.initializing:
         return 'Initializing SDK...';
+      case ModelStatus.initialized:
+        return 'SDK initialized. Model download required';
       case ModelStatus.downloading:
         return 'Downloading model... ${(state.downloadProgress! * 100).toInt()}%';
+      case ModelStatus.downloaded:
+        return 'Model downloaded. Warmup required';
       case ModelStatus.warming:
         return 'Warming up... ${(state.warmupProgress! * 100).toInt()}%';
       case ModelStatus.ready:
-        if (!state.isModelDownloaded) {
-          return 'SDK initialized. Model download required';
-        } else if (!state.isWarmedUp) {
-          return 'Model downloaded. Warmup required';
-        } else {
-          return 'Ready';
-        }
+        return 'Ready';
       case ModelStatus.error:
         return 'Error: ${state.errorMessage}';
     }
