@@ -1,0 +1,65 @@
+# name: Flutter CI
+
+# on:
+#   push:
+#     branches:
+#       - develop
+#   pull_request:
+#     branches:
+#       - develop
+
+# env:
+#   LICENSE_KEY: "2920-JI06-HXIT-AZ1B-7BX6-QNQC"
+
+# jobs:
+#   build-and-test:
+#     runs-on: self-hosted
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+#         with:
+#           persist-credentials: false # Git 인증 문제 방지
+#           submodules: recursive # Git submodule 문제 방지
+
+#       - name: Update Git Submodules
+#         run: |
+#           git submodule sync --recursive
+#           git submodule update --init --recursive
+#           git config --global --add safe.directory '*'
+
+#       - name: Setup Flutter
+#         uses: subosito/flutter-action@v2
+#         with:
+#           flutter-version: 3.x # 원하는 Flutter 버전 설정
+
+#       - name: Install dependencies for lora_sdk
+#         working-directory: flutter-sdk-package/lora_sdk
+#         run: |
+#           flutter clean
+#           flutter pub get
+
+#       - name: Install dependencies for example
+#         working-directory: flutter-sdk-package/lora_sdk/example
+#         run: |
+#           flutter clean
+#           flutter pub get
+
+#       - name: Run Flutter Analyzer (Lint)
+#         working-directory: flutter-sdk-package/lora_sdk/example
+#         run: |
+#           flutter analyze  # example 프로젝트에서 린트 검사 실행
+
+#       - name: Run Flutter Integration Tests on Real Device
+#         working-directory: flutter-sdk-package/lora_sdk/example
+#         run: |
+#           flutter devices
+#           flutter drive --driver=test_driver/integration_test.dart --target=integration_test/lora_sdk_test.dart --device-id=`flutter devices | grep "•" | awk '{print $1}'`
+#       - name: Build APK from example
+#         working-directory: flutter-sdk-package/lora_sdk/example
+#         run: |
+#           flutter build apk --release  # example 프로젝트 빌드
+
+#       - name: Build iOS from example (no-codesign)
+#         working-directory: flutter-sdk-package/lora_sdk/example
+#         run: |
+#           flutter build ios --no-codesign  # iOS 빌드 (macOS 환경 필요)
